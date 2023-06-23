@@ -1,0 +1,11 @@
+@import '../../styles/variables';
+
+.header {
+    background-color: $main;
+    padding: 5px 0;
+    border-radius: 0 0 5px 5px;
+
+    h1 {
+        color: #fff;
+    }
+}

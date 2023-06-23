@@ -1,0 +1,6 @@
+.table {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    grid-column-gap: 20px;
+}
