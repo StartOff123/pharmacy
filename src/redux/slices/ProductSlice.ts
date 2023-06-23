@@ -1,14 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from '../../axios'
 
-interface User {
-    id: number,
-    title: string,
-    price: string,
+type Status = 'loading' | 'success' | 'error'
+
+type Product = {
+    id: number
+    title: string
+    price: number
     quantity: number
 }
 
-export const getAllProducts = createAsyncThunk<User, {id: number} & Partial<User>>('product/getAllProducts', async () => {
+interface ProductSliceState {
+    productData: Product[]
+    status: Status
+    error: object
+}
+
+export const getAllProducts = createAsyncThunk('product/getAllProducts', async () => {
     try {
         const { data } = await axios.get('/product-all')
         return data
@@ -17,7 +25,7 @@ export const getAllProducts = createAsyncThunk<User, {id: number} & Partial<User
     }
 })
 
-const initialState = {
+const initialState: ProductSliceState = {
     productData: [],
     status: 'loading',
     error: {}
@@ -29,19 +37,19 @@ const productSlice = createSlice({
     reducers: {},
     extraReducers: builder => {
         builder.addCase(getAllProducts.pending, (state) => {
-            state.productData = [],
-                state.status = 'loading',
-                state.error = {}
+            state.productData = []
+            state.status = 'loading'
+            state.error = {}
         })
         builder.addCase(getAllProducts.fulfilled, (state, action) => {
-            state.productData = action.payload,
-                state.status = 'loaded',
-                state.error = {}
+            state.productData = action.payload
+            state.status = 'success'
+            state.error = {}
         })
         builder.addCase(getAllProducts.rejected, (state, action) => {
-            state.productData = [],
-                state.status = 'error',
-                state.error = action.error
+            state.productData = []
+            state.status = 'error'
+            state.error = action.error
         })
     }
 })

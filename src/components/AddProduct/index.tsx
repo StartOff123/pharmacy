@@ -17,7 +17,6 @@ const AddProduct = () => {
                 <Form
                     name="basic"
                     labelCol={{ span: 8 }}
-                    // wrapperCol={{ span: 18 }}
                     style={{ maxWidth: 600 }}
                     initialValues={{ remember: true }}
                     onFinish={onFinish}
@@ -34,7 +33,7 @@ const AddProduct = () => {
                         name="price"
                         rules={[{ required: true, message: 'Пожалуйста заполните это поле!' }]}
                     >
-                        <Input prefix="₽" suffix="RUB" placeholder='Цена' />
+                        <Input prefix="₽" suffix="RUB" placeholder='Цена' type='number' />
                     </Form.Item>
 
                     <Form.Item

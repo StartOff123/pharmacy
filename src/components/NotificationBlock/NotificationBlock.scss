@@ -1,0 +1,38 @@
+@import '../../styles/variables';
+
+.notificationblock {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border-radius: 8px;
+    height: fit-content;
+    margin-bottom: 20px;
+
+    &--header {
+        background-color: $main;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+            background: #678aea;
+            padding: 1px 9px;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 16px;
+            color: #fff;
+            padding: 10px 0;
+        }
+    }
+
+    &--body {
+        padding: 15px;
+    }
+}

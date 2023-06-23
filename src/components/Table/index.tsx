@@ -2,7 +2,7 @@ import React from 'react'
 import { Tabs } from 'antd'
 
 import ProductionTable from './ProductionTable'
-import { AddProduct } from '../'
+import { AddProduct, NotificationBlock } from '../'
 
 import './Table.scss'
 
@@ -12,7 +12,10 @@ const Table = () => {
             <Tabs.TabPane tab='Продукция'>
                 <div className='table'>
                     <ProductionTable />
-                    <AddProduct />
+                    <div className='table--right'>
+                        <AddProduct />
+                        <NotificationBlock />
+                    </div>
                 </div>
             </Tabs.TabPane>
         </Tabs>

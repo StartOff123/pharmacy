@@ -5,6 +5,7 @@
     overflow: hidden;
     border-radius: 8px;
     height: fit-content;
+    margin-bottom: 20px;
 
     &--header {
         background-color: $main;
@@ -20,4 +21,10 @@
     &--form {
         padding: 15px;
     }
+}
+
+@media screen and (max-width: $sm) {
+    .addproduct {
+        max-width: none;
+    }    
 }
