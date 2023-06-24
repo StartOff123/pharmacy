@@ -20,8 +20,8 @@ const notificationSlice = createSlice({
     name: 'notification',
     initialState,
     reducers: {
-        getNotificarion: (state, action: PayloadAction<Notification[]>) => {
-            state.notification = action.payload
+        getNotificarion: (state, action) => {
+            state.notification = new Array(...state.notification, action.payload)
         },
         removeNotification: (state, action) => {
             state.notification = state.notification.filter(obj => obj.code !== action.payload)

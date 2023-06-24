@@ -1,11 +1,30 @@
 import React from 'react'
 import { Form, Input, Button, InputNumber } from 'antd'
+import { useDispatch } from 'react-redux'
+import { getAllProducts, postAddProduct } from '../../redux/slices/ProductSlice'
+import { AppDispath } from '../../redux/store'
+import { getNotificarion } from '../../redux/slices/NotificationSlice'
+import { useAppSelector } from '../../redux/hooks'
 
 import './AddProduct.scss'
 
 const AddProduct = () => {
-    const onFinish = (values: any) => {
-        console.log(values)
+    const dispath = useDispatch<AppDispath>()
+
+    const [isLoading, setIsLoading] = React.useState(false)
+
+    const { errors } = useAppSelector(state => state.ProductSlice)
+
+    const onFinish = async (values: { title: string, price: number, quantity: string }) => {
+        try {
+            setIsLoading(true)
+            await dispath(postAddProduct(values))
+            dispath(getAllProducts())
+            dispath(getNotificarion({ code: '', typeNotification: 'success', description: `Продукт '${values.title}' успешно добавлен.` }))
+            setIsLoading(false)
+        } catch (err) {
+        }
+
     }
 
     return (
@@ -44,7 +63,7 @@ const AddProduct = () => {
                     </Form.Item>
 
                     <Form.Item style={{ margin: 0 }}>
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={isLoading} type="primary" htmlType="submit">
                             Добавить
                         </Button>
                     </Form.Item>

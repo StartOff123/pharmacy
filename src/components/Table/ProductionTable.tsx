@@ -1,9 +1,10 @@
 import React from 'react'
-import { Table, Button, Input, ConfigProvider, Empty } from 'antd'
+import { Table, Button, Input, ConfigProvider, Empty, Modal } from 'antd'
+import { ExclamationCircleFilled } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { getAllProducts } from '../../redux/slices/ProductSlice'
+import { deleteProduct, getAllProducts } from '../../redux/slices/ProductSlice'
 import { AppDispath } from '../../redux/store'
 import { getNotificarion } from '../../redux/slices/NotificationSlice'
 
@@ -16,33 +17,60 @@ interface DataType {
   quantity: number
 }
 
-const columns: ColumnsType<DataType> = [
-  { title: '№', dataIndex: 'id', key: 'id' },
-  { title: 'Название', dataIndex: 'title', key: 'title' },
-  { title: 'Цена', dataIndex: 'price', key: 'price' },
-  { title: 'Количество', dataIndex: 'quantity', key: 'quantity' },
-  {
-    title: 'Действия',
-    dataIndex: '',
-    key: 'x',
-    render: () => <Button type='primary' danger><i className="bi bi-trash"></i></Button>,
-  },
-]
-
 const ProductionTable: React.FC = () => {
   const dispath = useDispatch<AppDispath>()
 
-  const { productData, error } = useSelector((state: any) => state.ProductSlice)
+  const [isLoading, setIsLoading] = React.useState(false)
 
-  if (error) dispath(getNotificarion([{ code: 'ERR_PRODUCT_TABLE', typeNotification: 'error', description: error.message }]))
+  const { productData, errors } = useSelector((state: any) => state.ProductSlice)
 
-  React.useEffect(() => { dispath(getAllProducts()) }, [])
+  if (errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')) {
+    const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
+    dispath(getNotificarion({ code: currentError.code, typeNotification: 'error', description: currentError.message }))
+  }
+
+  const columns: ColumnsType<DataType> = [
+    { title: '№', dataIndex: 'id', key: 'id' },
+    { title: 'Название', dataIndex: 'title', key: 'title' },
+    { title: 'Цена (руб)', dataIndex: 'price', key: 'price' },
+    { title: 'Количество', dataIndex: 'quantity', key: 'quantity' },
+    {
+      title: 'Действия',
+      dataIndex: '',
+      key: 'x',
+      render: (product) => <Button type='primary' danger onClick={() => deleteConfirm(product.id)}><i className="bi bi-trash"></i></Button>,
+    },
+  ]
+
+  const deleteConfirm = (id: string) => {
+    Modal.confirm({
+      title: 'Удаление продукта',
+      icon: <ExclamationCircleFilled />,
+      content: 'Вы действительно хотите удалить этот продукт?',
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk() { onRemove(id) },
+
+    })
+  }
+
+  const onRemove = async (id: string) => {
+    await dispath(deleteProduct(id))
+    dispath(getAllProducts())
+  }
+
+  React.useEffect(() => { 
+    setIsLoading(true)
+    dispath(getAllProducts()) 
+    setIsLoading(false)
+  }, [])
 
   return (
     <div>
       <Input.Search placeholder='Поиск' style={{ marginBottom: '20px' }} />
       <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Таблица пуста" />}>
-        <Table size='small' dataSource={productData} columns={columns} />
+        <Table loading={isLoading} size='small' dataSource={productData} columns={columns} />
       </ConfigProvider>
     </div>
   )

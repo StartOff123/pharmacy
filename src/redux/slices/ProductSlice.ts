@@ -1,10 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction, SerializedError } from '@reduxjs/toolkit'
 import axios from '../../axios'
 
 type Status = 'loading' | 'success' | 'error'
 
 type Product = {
-    id: number
+    id?: number
     title: string
     price: number
     quantity: number
@@ -13,7 +13,7 @@ type Product = {
 interface ProductSliceState {
     productData: Product[]
     status: Status
-    error: object
+    errors: SerializedError[]
 }
 
 export const getAllProducts = createAsyncThunk('product/getAllProducts', async () => {
@@ -25,10 +25,27 @@ export const getAllProducts = createAsyncThunk('product/getAllProducts', async (
     }
 })
 
+export const postAddProduct = createAsyncThunk('product/postAddProduct', async (params: object) => {
+    try {
+        const { data } = await axios.post('/product-add', params)
+        return data
+    } catch (error: any) {
+        throw error.response.data
+    }
+})
+
+export const deleteProduct = createAsyncThunk('product/deleteProduct', async (params: string) => {
+    try {
+        await axios.delete(`/product-delete/${params}`)
+    } catch (error: any) {
+        throw error.response.data
+    }
+})
+
 const initialState: ProductSliceState = {
     productData: [],
     status: 'loading',
-    error: {}
+    errors: []
 }
 
 const productSlice = createSlice({
@@ -39,17 +56,31 @@ const productSlice = createSlice({
         builder.addCase(getAllProducts.pending, (state) => {
             state.productData = []
             state.status = 'loading'
-            state.error = {}
         })
         builder.addCase(getAllProducts.fulfilled, (state, action) => {
             state.productData = action.payload
             state.status = 'success'
-            state.error = {}
         })
         builder.addCase(getAllProducts.rejected, (state, action) => {
-            state.productData = []
             state.status = 'error'
-            state.error = action.error
+            state.errors = new Array(...state.errors, action.error)
+        })
+
+        builder.addCase(postAddProduct.fulfilled, (state, action) => {
+            state.productData = new Array(...state.productData, action.payload)
+            state.status = 'success'
+        })
+        builder.addCase(postAddProduct.rejected, (state, action) => {
+            state.status = 'error'
+            state.errors = new Array(...state.errors, action.error)
+        })
+
+        builder.addCase(deleteProduct.fulfilled, (state) => {
+            state.status = 'success'
+        })
+        builder.addCase(deleteProduct.rejected, (state, action) => {
+            state.status = 'error'
+            state.errors = new Array(...state.errors, action.error)
         })
     }
 })
