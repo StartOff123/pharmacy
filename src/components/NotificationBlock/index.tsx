@@ -8,30 +8,31 @@ import { removeNotification } from '../../redux/slices/NotificationSlice'
 
 const NotificationBlock = () => {
   const dispath = useDispatch()
-  const { notification } = useAppSelector(state => state.NotificationSlice)
+  const { notifications } = useAppSelector(state => state.NotificationSlice)
 
-  const onRemoveNotification = (code: string) => dispath(removeNotification(code))
+  const onRemoveNotification = (code: number) => dispath(removeNotification(code))
 
   return (
     <div className='notificationblock'>
       <div className='notificationblock--header'>
         <h1>Уведомления</h1>
-        {notification.length > 0 &&
-          <span>{notification.length}</span>
+        {notifications.length > 0 &&
+          <span>{notifications.length}</span>
         }
       </div>
       <div className='notificationblock--body'>
         {
-          notification.length > 0 ? notification.map(item =>
+          notifications.length > 0 ? notifications.map(item =>
             <Alert
-              key={item.code}
-              type={item.typeNotification}
+              style={{ marginTop: '15px' }}
+              key={item.uniqureCode}
+              type={item.type}
               description={item.description}
               closable
               showIcon
-              onClose={() => onRemoveNotification(item.code)}
+              onClose={() => onRemoveNotification(item.uniqureCode)}
             />
-          ) : <Empty description='Список уведомлений пуст' />
+          ).reverse() : <Empty style={{ marginTop: '15px' }} description='Список уведомлений пуст' />
         }
       </div>
     </div>

@@ -34,9 +34,10 @@ export const postAddProduct = createAsyncThunk('product/postAddProduct', async (
     }
 })
 
-export const deleteProduct = createAsyncThunk('product/deleteProduct', async (params: string) => {
+export const deleteProduct = createAsyncThunk('product/deleteProduct', async (params: number) => {
     try {
         await axios.delete(`/product-delete/${params}`)
+        return params
     } catch (error: any) {
         throw error.response.data
     }
@@ -75,7 +76,8 @@ const productSlice = createSlice({
             state.errors = new Array(...state.errors, action.error)
         })
 
-        builder.addCase(deleteProduct.fulfilled, (state) => {
+        builder.addCase(deleteProduct.fulfilled, (state, action) => {
+            state.productData = state.productData.filter(obj => obj.id !== action.payload)
             state.status = 'success'
         })
         builder.addCase(deleteProduct.rejected, (state, action) => {

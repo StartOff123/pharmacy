@@ -1,30 +1,31 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 type TypeNotification = 'error' | 'success' | 'warning'
 
 type Notification = {
     code: string
-    typeNotification: TypeNotification
+    uniqureCode: number
+    type: TypeNotification
     description: string
 }
 
 interface NotificationSliceState {
-    notification: Notification[]
+    notifications: Notification[]
 }
 
 const initialState: NotificationSliceState = {
-    notification: []
+    notifications: [],
 }
 
 const notificationSlice = createSlice({
     name: 'notification',
     initialState,
     reducers: {
-        getNotificarion: (state, action) => {
-            state.notification = new Array(...state.notification, action.payload)
+        getNotificarion: (state, action: PayloadAction<Notification>) => {
+            state.notifications = new Array(...state.notifications, action.payload)
         },
         removeNotification: (state, action) => {
-            state.notification = state.notification.filter(obj => obj.code !== action.payload)
+            state.notifications = state.notifications.filter(n => n.uniqureCode !== action.payload)
         }
     }
 })

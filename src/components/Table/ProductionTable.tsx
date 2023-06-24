@@ -4,9 +4,9 @@ import { ExclamationCircleFilled } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { useSelector, useDispatch } from 'react-redux'
 
+import { getNotificarion } from '../../redux/slices/NotificationSlice'
 import { deleteProduct, getAllProducts } from '../../redux/slices/ProductSlice'
 import { AppDispath } from '../../redux/store'
-import { getNotificarion } from '../../redux/slices/NotificationSlice'
 
 import './Table.scss'
 
@@ -19,15 +19,14 @@ interface DataType {
 
 const ProductionTable: React.FC = () => {
   const dispath = useDispatch<AppDispath>()
-
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoadingRemove, setIsLoadingRemove] = React.useState(false)
 
   const { productData, errors } = useSelector((state: any) => state.ProductSlice)
 
-  if (errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')) {
-    const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
-    dispath(getNotificarion({ code: currentError.code, typeNotification: 'error', description: currentError.message }))
-  }
+  // if (errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')) {
+  //   const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
+  //   dispath(getNotificarion({ code: currentError.code, type: 'error', description: currentError.message }))
+  // }
 
   const columns: ColumnsType<DataType> = [
     { title: '№', dataIndex: 'id', key: 'id' },
@@ -42,7 +41,7 @@ const ProductionTable: React.FC = () => {
     },
   ]
 
-  const deleteConfirm = (id: string) => {
+  const deleteConfirm = (id: number) => {
     Modal.confirm({
       title: 'Удаление продукта',
       icon: <ExclamationCircleFilled />,
@@ -50,27 +49,26 @@ const ProductionTable: React.FC = () => {
       okText: 'Удалить',
       okType: 'danger',
       cancelText: 'Отмена',
+      okButtonProps: {
+        loading: isLoadingRemove
+      },
       onOk() { onRemove(id) },
-
     })
   }
 
-  const onRemove = async (id: string) => {
-    await dispath(deleteProduct(id))
-    dispath(getAllProducts())
+  const onRemove = async (id: number) => {
+    setIsLoadingRemove(true)
+    await dispath(deleteProduct(id)).then(() => setIsLoadingRemove(false))
+    dispath(getNotificarion({ code: 'SUCCESS_DELETE_PRODUCT', uniqureCode: Math.floor(Math.random() * 1000000), type: 'success', description: 'Продукт был удален из таблицы.' }))
   }
 
-  React.useEffect(() => { 
-    setIsLoading(true)
-    dispath(getAllProducts()) 
-    setIsLoading(false)
-  }, [])
+  React.useEffect(() => { dispath(getAllProducts()) }, [])
 
   return (
     <div>
       <Input.Search placeholder='Поиск' style={{ marginBottom: '20px' }} />
       <ConfigProvider renderEmpty={() => <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Таблица пуста" />}>
-        <Table loading={isLoading} size='small' dataSource={productData} columns={columns} />
+        <Table size='small' dataSource={productData} columns={columns} />
       </ConfigProvider>
     </div>
   )

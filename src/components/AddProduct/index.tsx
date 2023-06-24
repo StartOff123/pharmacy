@@ -13,14 +13,17 @@ const AddProduct = () => {
 
     const [isLoading, setIsLoading] = React.useState(false)
 
-    const { errors } = useAppSelector(state => state.ProductSlice)
-
     const onFinish = async (values: { title: string, price: number, quantity: string }) => {
         try {
             setIsLoading(true)
             await dispath(postAddProduct(values))
             dispath(getAllProducts())
-            dispath(getNotificarion({ code: '', typeNotification: 'success', description: `Продукт '${values.title}' успешно добавлен.` }))
+            dispath(getNotificarion({ 
+                code: 'SUCCESS_ADD_PRODUCT', 
+                uniqureCode: Math.floor(Math.random() * 1000000000),
+                type: 'success', 
+                description: `Продукт '${values.title}' успешно добавлен.` 
+            }))
             setIsLoading(false)
         } catch (err) {
         }
