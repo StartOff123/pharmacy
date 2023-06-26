@@ -64,6 +64,7 @@ const productSlice = createSlice({
         })
         builder.addCase(getAllProducts.rejected, (state, action) => {
             state.status = 'error'
+            if (state.errors.find((error: any) => error.code !== 'ERR_PRODUCT_TABLE')) return
             state.errors = new Array(...state.errors, action.error)
         })
 

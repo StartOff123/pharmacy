@@ -27,3 +27,11 @@
         }
     }    
 }
+
+@media screen and (max-width: $xs) {
+    .table {
+        &--right {
+            display: block;
+        }
+    }    
+}

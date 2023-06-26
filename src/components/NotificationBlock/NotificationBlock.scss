@@ -37,3 +37,9 @@
         padding-top: 0;
     }
 }
+
+@media screen and (max-width: $xs) {
+    .notificationblock {
+        display: none;
+    }    
+}

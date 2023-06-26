@@ -5,7 +5,36 @@
     padding: 5px 0;
     border-radius: 0 0 5px 5px;
 
-    h1 {
-        color: #fff;
+    &--inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h1 {
+            color: #fff;
+        }
+
+        &__notification {
+            display: none;
+
+            span {
+                svg {
+                    color: #fff !important;
+                    width: 20px !important;
+                    height: 20px !important;
+                    
+                }
+            }
+        }
     }
+}
+
+@media screen and (max-width: $xs) {
+    .header {
+        &--inner {
+            &__notification {
+                display: block;
+            }
+        }
+    }    
 }

@@ -28,3 +28,9 @@
         max-width: none;
     }    
 }
+
+@media screen and (max-width: $sm) {
+    .addproduct {
+        max-width: none;
+    }    
+}

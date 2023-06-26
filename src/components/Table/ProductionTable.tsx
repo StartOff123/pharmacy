@@ -17,15 +17,23 @@ interface DataType {
   quantity: number
 }
 
-const ProductionTable: React.FC = () => {
+const ProductionTable = () => {
   const dispath = useDispatch<AppDispath>()
   const [isLoadingRemove, setIsLoadingRemove] = React.useState(false)
 
   const { productData, errors } = useSelector((state: any) => state.ProductSlice)
 
-  // if (errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')) {
-  //   const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
-  //   dispath(getNotificarion({ code: currentError.code, type: 'error', description: currentError.message }))
+  // const setErrors = () => {
+  //   if (errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')) {
+  //     const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
+
+  //     dispath(getNotificarion({
+  //       code: currentError.code,
+  //       uniqureCode: Math.floor(Math.random() * 1000000000),
+  //       type: 'error',
+  //       description: currentError.message
+  //     }))
+  //   }
   // }
 
   const columns: ColumnsType<DataType> = [
@@ -58,11 +66,45 @@ const ProductionTable: React.FC = () => {
 
   const onRemove = async (id: number) => {
     setIsLoadingRemove(true)
-    await dispath(deleteProduct(id)).then(() => setIsLoadingRemove(false))
-    dispath(getNotificarion({ code: 'SUCCESS_DELETE_PRODUCT', uniqureCode: Math.floor(Math.random() * 1000000), type: 'success', description: 'Продукт был удален из таблицы.' }))
+    await dispath(deleteProduct(id)).then(data => {
+      setIsLoadingRemove(false)
+
+      if (data.meta.requestStatus === 'fulfilled') {
+        dispath(getNotificarion({
+          code: 'SUCCESS_DELETE_PRODUCT',
+          uniqureCode: Math.floor(Math.random() * 1000000),
+          type: 'success',
+          description: 'Продукт был удален из таблицы.'
+        }))
+      } else {
+        const currentError = errors.find((error: any) => error.code === 'ERR_REMOVE_PRODUCT')
+
+        dispath(getNotificarion({
+          code: currentError.code,
+          uniqureCode: Math.floor(Math.random() * 1000000000),
+          type: 'error',
+          description: currentError.message
+        }))
+      }
+    })
   }
 
-  React.useEffect(() => { dispath(getAllProducts()) }, [])
+  React.useEffect(() => {
+    dispath(getAllProducts()).then(data => {
+      if (data.meta.requestStatus === 'rejected') {
+        const currentError = errors.find((error: any) => error.code === 'ERR_PRODUCT_TABLE')
+
+        dispath(getNotificarion({
+          code: currentError.code,
+          uniqureCode: Math.floor(Math.random() * 1000000000),
+          type: 'error',
+          description: currentError.message
+        }))
+      }
+    })
+  }, [])
+
+  // React.useEffect(() => { setErrors() }, [errors])
 
   return (
     <div>

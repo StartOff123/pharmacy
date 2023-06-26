@@ -10,25 +10,57 @@ import './AddProduct.scss'
 
 const AddProduct = () => {
     const dispath = useDispatch<AppDispath>()
+    const { errors } = useAppSelector((state: any) => state.ProductSlice)
+    const { notifications } = useAppSelector((state: any) => state.NotificationSlice)
 
     const [isLoading, setIsLoading] = React.useState(false)
 
     const onFinish = async (values: { title: string, price: number, quantity: string }) => {
-        try {
-            setIsLoading(true)
-            await dispath(postAddProduct(values))
-            dispath(getAllProducts())
-            dispath(getNotificarion({ 
-                code: 'SUCCESS_ADD_PRODUCT', 
-                uniqureCode: Math.floor(Math.random() * 1000000000),
-                type: 'success', 
-                description: `Продукт '${values.title}' успешно добавлен.` 
-            }))
-            setIsLoading(false)
-        } catch (err) {
-        }
+        setIsLoading(true)
+        await dispath(postAddProduct(values)).then(data => {
+            if (data.meta.requestStatus === 'fulfilled') {
+                dispath(getNotificarion({
+                    code: 'SUCCESS_ADD_PRODUCT',
+                    uniqureCode: Math.floor(Math.random() * 1000000000),
+                    type: 'success',
+                    description: `Продукт успешно добавлен.`
+                }))
+            } else {
+                const currentError = errors.find((error: any) => error.code === 'ERR_ADD_PRODUCT')
 
+                dispath(getNotificarion({
+                    code: currentError.code,
+                    uniqureCode: Math.floor(Math.random() * 1000000000),
+                    type: 'error',
+                    description: currentError.message
+                }))
+            }
+        })
+        dispath(getAllProducts())
+        setIsLoading(false)
     }
+
+    // const senNotification = () => {
+    //     if (errors.find((error: any) => error.code === 'ERR_ADD_PRODUCT')) {
+    //         const currentError = errors.find((error: any) => error.code === 'ERR_ADD_PRODUCT')
+
+    //         dispath(getNotificarion({
+    //             code: currentError.code,
+    //             uniqureCode: Math.floor(Math.random() * 1000000000),
+    //             type: 'error',
+    //             description: currentError.message
+    //         }))
+    //     } else {
+    //         dispath(getNotificarion({
+    //             code: 'SUCCESS_ADD_PRODUCT',
+    //             uniqureCode: Math.floor(Math.random() * 1000000000),
+    //             type: 'success',
+    //             description: `Продукт успешно добавлен.`
+    //         }))
+    //     }
+    // }
+
+    // React.useEffect(() => { senNotification() }, [errors])
 
     return (
         <div className='addproduct'>
